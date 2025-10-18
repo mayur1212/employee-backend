@@ -1,9 +1,5 @@
-
-
 import { Employee } from "../models/Employee.js";
 import { Department } from "../models/Department.js";
-
-
 
 export const resolvers = {
   Query: {
@@ -17,29 +13,29 @@ export const resolvers = {
 
   Mutation: {
     addEmployee: async (_: any, { name, position, departmentId, salary }: any) => {
-      const employee = new Employee({ name, position, department: departmentId, salary });
+      const employee = new Employee({ name, position, salary, department: departmentId });
       await employee.save();
       return employee.populate("department");
     },
 
     updateEmployee: async (_: any, { id, name, position, departmentId, salary }: any) => {
-      const updated = await Employee.findByIdAndUpdate(
+      const employee = await Employee.findByIdAndUpdate(
         id,
         { name, position, department: departmentId, salary },
         { new: true }
-      ).populate("department");
-      return updated;
+      );
+      return employee?.populate("department");
     },
 
     deleteEmployee: async (_: any, { id }: { id: string }) => {
-      const res = await Employee.findByIdAndDelete(id);
-      return !!res;
+      const result = await Employee.findByIdAndDelete(id);
+      return !!result;
     },
 
-    addDepartment: async (_: any, { name, floor }: any) => {
-      const dept = new Department({ name, floor });
-      await dept.save();
-      return dept;
+    addDepartment: async (_: any, { name, floor }: { name: string; floor?: string }) => {
+      const department = new Department({ name, floor });
+      await department.save();
+      return department;
     },
   },
 };

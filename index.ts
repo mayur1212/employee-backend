@@ -9,24 +9,25 @@ import { expressMiddleware } from "@apollo/server/express4";
 import { typeDefs } from "./schema/typeDefs.js";
 import { resolvers } from "./resolvers/resolvers.js";
 
-
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI as string;
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://employee-frontend1.onrender.com",
-];
+// ✅ Read allowed frontend URLs from .env
+const allowedOrigins = (process.env.FRONTEND_URL || "").split(",");
 
 app.use(
   cors({
-    origin: (origin, callback) =>
-      !origin || allowedOrigins.includes(origin)
-        ? callback(null, true)
-        : callback(new Error("Not allowed by CORS")),
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.error("Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -50,14 +51,11 @@ const startServer = async () => {
     const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
     await server.start();
 
-    app.use("/graphql", express.json(), expressMiddleware(server));
+    // ✅ Apply Apollo middleware with CORS
+    app.use("/graphql", cors({ origin: allowedOrigins, credentials: true }), express.json(), expressMiddleware(server));
 
     app.listen(PORT, () => {
-      const baseURL =
-        process.env.NODE_ENV === "production"
-          ? `https://employee-backend-y5xe.onrender.com/graphql`
-          : `http://localhost:${PORT}/graphql`;
-      console.log(`🚀 Server ready at: ${baseURL}`);
+      console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
     });
   } catch (error) {
     console.error("❌ Failed to start server:", (error as Error).message);

@@ -1,33 +1,19 @@
-import { Employee } from "../models/Employee";
-import { Department } from "../models/Department";
+import { Employee } from "../models/Employee.ts";
+import { Department } from "../models/Department.ts";
 
 export const resolvers = {
   Query: {
-    getAllEmployees: async () => {
-      return await Employee.find().populate("department");
-    },
-
-    getEmployeeDetails: async (_: any, { id }: { id: string }) => {
-      return await Employee.findById(id).populate("department");
-    },
-
-    getEmployeesByDepartment: async (_: any, { departmentId }: { departmentId: string }) => {
-      return await Employee.find({ department: departmentId }).populate("department");
-    },
-
-    getAllDepartments: async () => {
-      return await Department.find();
-    },
+    getAllEmployees: async () => await Employee.find().populate("department"),
+    getEmployeeDetails: async (_: any, { id }: { id: string }) =>
+      await Employee.findById(id).populate("department"),
+    getEmployeesByDepartment: async (_: any, { departmentId }: { departmentId: string }) =>
+      await Employee.find({ department: departmentId }).populate("department"),
+    getAllDepartments: async () => await Department.find(),
   },
 
   Mutation: {
     addEmployee: async (_: any, { name, position, departmentId, salary }: any) => {
-      const employee = new Employee({
-        name,
-        position,
-        department: departmentId,
-        salary,
-      });
+      const employee = new Employee({ name, position, department: departmentId, salary });
       await employee.save();
       return employee.populate("department");
     },

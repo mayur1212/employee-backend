@@ -1,23 +1,44 @@
 import express from "express";
+import type { Request, Response, NextFunction } from "express"; // ✅ type-only import
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
-import { ApolloServer } from "apollo-server-express"; // ✅
-import { typeDefs } from "./schema/typeDefs";
-import { resolvers } from "./resolvers/resolvers";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
+
+import { typeDefs } from "./schema/typeDefs.ts";
+import { resolvers } from "./resolvers/resolvers.ts";
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI as string;
 
-// Sample test route
-app.get("/", (req, res) => {
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://employee-frontend1.onrender.com"
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) =>
+      !origin || allowedOrigins.includes(origin)
+        ? callback(null, true)
+        : callback(new Error("Not allowed by CORS")),
+    credentials: true
+  })
+);
+
+app.use(express.json());
+
+app.get("/", (req: Request, res: Response) => {
   res.send("🚀 Employee Backend is running successfully!");
+});
+
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error("❌ Server error:", err.message);
+  res.status(500).json({ message: "Internal server error" });
 });
 
 const startServer = async () => {
@@ -25,21 +46,21 @@ const startServer = async () => {
     await mongoose.connect(MONGO_URI);
     console.log("✅ MongoDB connected successfully");
 
-    // Create Apollo Server
-    const server = new ApolloServer({
-      typeDefs,
-      resolvers,
-    });
+    const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
     await server.start();
 
-    // Mount GraphQL endpoint
-    server.applyMiddleware({ app, path: "/graphql" });
+    app.use("/graphql", express.json(), expressMiddleware(server));
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}${server.graphqlPath}`);
+      const baseURL =
+        process.env.NODE_ENV === "production"
+          ? `https://employee-backend-y5xe.onrender.com/graphql`
+          : `http://localhost:${PORT}/graphql`;
+      console.log(`🚀 Server ready at: ${baseURL}`);
     });
   } catch (error) {
-    console.error("❌ Error starting server:", error);
+    console.error("❌ Failed to start server:", (error as Error).message);
+    process.exit(1);
   }
 };
 

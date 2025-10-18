@@ -1,8 +1,13 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document } from "mongoose";
 
-const departmentSchema = new mongoose.Schema({
+export interface IDepartment extends Document {
+  name: string;
+  floor?: string;
+}
+
+const DepartmentSchema: Schema = new Schema({
   name: { type: String, required: true },
   floor: { type: String },
 });
 
-export const Department = mongoose.model("Department", departmentSchema);
+export const Department = mongoose.model<IDepartment>("Department", DepartmentSchema);

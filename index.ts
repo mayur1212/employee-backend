@@ -15,7 +15,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI as string;
 
-// ✅ Read allowed frontend URLs from .env
+// ✅ Allowed frontend URLs
 const allowedOrigins = (process.env.FRONTEND_URL || "").split(",");
 
 app.use(
@@ -38,6 +38,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("🚀 Employee Backend is running successfully!");
 });
 
+// ✅ Global error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error("❌ Server error:", err.message);
   res.status(500).json({ message: "Internal server error" });
@@ -51,11 +52,16 @@ const startServer = async () => {
     const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
     await server.start();
 
-    // ✅ Apply Apollo middleware with CORS
-    app.use("/graphql", cors({ origin: allowedOrigins, credentials: true }), express.json(), expressMiddleware(server));
+    // ✅ Apply Apollo middleware with the same CORS config
+    app.use(
+      "/graphql",
+      cors({ origin: allowedOrigins, credentials: true }),
+      express.json(),
+      expressMiddleware(server)
+    );
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
+      console.log(`🚀 Server ready at https://employee-backend-y5xe.onrender.com/graphql`);
     });
   } catch (error) {
     console.error("❌ Failed to start server:", (error as Error).message);

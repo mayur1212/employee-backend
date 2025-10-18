@@ -1,5 +1,8 @@
-import Employee from "../models/Employee.js";
-import Department from "../models/Department.js";
+
+
+import { Employee } from "../models/Employee.js";
+import { Department } from "../models/Department.js";
+
 
 
 export const resolvers = {

@@ -23,8 +23,19 @@ export const typeDefs = gql`
   }
 
   type Mutation {
-    addEmployee(name: String!, position: String!, departmentId: ID!, salary: Float!): Employee!
-    updateEmployee(id: ID!, name: String, position: String, departmentId: ID, salary: Float): Employee
+    addEmployee(
+      name: String!
+      position: String!
+      departmentId: ID!
+      salary: Float!
+    ): Employee!
+    updateEmployee(
+      id: ID!
+      name: String
+      position: String
+      departmentId: ID
+      salary: Float
+    ): Employee
     deleteEmployee(id: ID!): Boolean!
     addDepartment(name: String!, floor: String): Department!
   }

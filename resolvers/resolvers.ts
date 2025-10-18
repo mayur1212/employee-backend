@@ -1,5 +1,6 @@
-import { Employee } from "../models/Employee.ts";
-import { Department } from "../models/Department.ts";
+import Employee from "../models/Employee";  // remove .ts
+import Department from "../models/Department";  // remove .ts
+
 
 export const resolvers = {
   Query: {

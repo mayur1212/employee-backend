@@ -15,9 +15,10 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const MONGO_URI = process.env.MONGO_URI as string;
 
-// ✅ Allowed frontend URLs
+// ✅ Allowed frontend URLs from .env
 const allowedOrigins = (process.env.FRONTEND_URL || "").split(",");
 
+// ✅ Global CORS middleware
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -34,6 +35,7 @@ app.use(
 
 app.use(express.json());
 
+// ✅ Test route
 app.get("/", (req: Request, res: Response) => {
   res.send("🚀 Employee Backend is running successfully!");
 });

@@ -1,5 +1,5 @@
-import Employee from "../models/Employee";  // remove .ts
-import Department from "../models/Department";  // remove .ts
+import Employee from "../models/Employee.js";
+import Department from "../models/Department.js";
 
 
 export const resolvers = {

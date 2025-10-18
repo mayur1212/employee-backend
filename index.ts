@@ -6,8 +6,9 @@ import cors from "cors";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 
-import { typeDefs } from "./schema/typeDefs";   // ✅ remove .ts
-import { resolvers } from "./resolvers/resolvers"; // ✅ remove .ts
+import { typeDefs } from "./schema/typeDefs.js";
+import { resolvers } from "./resolvers/resolvers.js";
+
 
 dotenv.config();
 
